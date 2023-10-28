@@ -57,12 +57,12 @@
         .legend {
             background-color: rgba(255, 255, 255, 0.9);
             border-radius: 3px;
-            bottom: 40px;
+            top: 10px;
+            left: 10px;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.10);
             font: 12px/14px 'Helvetica Neue', Arial, Helvetica, sans-serif;
             padding: 10px;
             position: absolute;
-            right: 10px;
             z-index: 1;
             line-height: 20px;
             height: auto;
@@ -97,6 +97,7 @@
         </div>
     </div>
     <div id="legend-bear" style="display:block;" class='legend'>
+        <h1>熊出没マップ</h1>
         <label><b>ヒグマ・ツキノワグマの生息が<br>1回以上確認された地域に着色<br>(5kmメッシュ)</b></label><br>
         <div class="square" style='background-color: rgb(255, 63, 0, 1.0); display: inline-block;'>
         </div><span style="display: inline-block; margin-left: 5px;">2000-2004年と2010-2017年の両方</span><br>
@@ -150,7 +151,7 @@
         // Attributionを折りたたみ表示
         map.addControl(new maplibregl.AttributionControl({
             compact: true,
-            customAttribution: '（<a href="https://twitter.com/shi__works" target="_blank">Twitter</a> | <a href="https://github.com/shi-works/gsi-swale-map-on-maplibre-gl-js" target="_blank">Github</a>） '
+            customAttribution: '（<a href="https://twitter.com/shi__works" target="_blank">Twitter</a> | <a href="https://github.com/shi-works/Bear-Encounter-Map-on-MapLibre-GL-JS" target="_blank">Github</a>） '
         }));
 
         // 3D地形コントロール
@@ -393,6 +394,26 @@
                     'text-color': 'rgba(0, 0, 0, 1)',
                     'text-halo-color': 'rgba(255, 255, 255, 1)',
                     'text-halo-width': 2
+                }
+            });
+
+            // 都道府県境界ソース
+            map.addSource('pref-borders', {
+                'type': 'geojson',
+                'data': 'https://xs489works.xsrv.jp/pmtiles-data/ksj/prefectures.geojson',
+                attribution: '<a href="https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N03-v3_1.html">国土数値情報 行政区域データ（令和5年度）</a>'
+            });
+
+            // 都道府県境界ラインレイヤ
+            map.addLayer({
+                "id": "pref-borders-line",
+                "type": "line",
+                "source": "pref-borders",
+                minzoom: 1,
+                maxzoom: 9,
+                'paint': {
+                    'line-color': 'rgba(0, 0, 0, 1)',
+                    'line-width': 1.5
                 }
             });
 
