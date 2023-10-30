@@ -54,6 +54,19 @@
             cursor: ew-resize;
         }
 
+        .maplibregl-popup .maplibregl-popup-content {
+            padding: 8px 10px;
+            font: 12px/14px Arial, Helvetica, sans-serif;
+            color: black;
+            background: white;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+            border-radius: 5px;
+            width: 220px;
+            height: 200px;
+            overflow: scroll;
+        }
+
         .legend {
             background-color: rgba(255, 255, 255, 0.9);
             border-radius: 3px;
@@ -99,10 +112,12 @@
     <div id="legend-bear" style="display:block;" class='legend'>
         <h1>熊出没マップ</h1>
         <label><b>ヒグマ・ツキノワグマの生息が<br>1回以上確認された地域に着色<br>(5kmメッシュ)</b></label><br>
-        <div class="square" style='background-color: rgb(255, 63, 0, 1.0); display: inline-block;'>
+        <div class="square" style='background-color: rgb(255, 76, 0, 0.6); display: inline-block;'>
         </div><span style="display: inline-block; margin-left: 5px;">2000-2004年と2010-2017年の両方</span><br>
-        <div class="square" style='background-color: rgb(255, 127, 0, 0.5); display: inline-block;'>
+        <div class="square" style='background-color: rgb(255, 127, 0, 0.4); display: inline-block;'>
         </div><span style="display: inline-block; margin-left: 5px;">2010-2017年</span><br>
+        <div><img src="./img/bear-icon.png" alt="熊アイコン" style="width:20px; height:20px;" />2023年度
+            熊目撃等情報<br>(2023-10-30時点)</div>
         <div class="square" style='background-color: rgba(0, 203, 0, 0.5);display: inline-block;'></div>
         <span style="display: inline-block; margin-left: 5px;">人口集中地区（2020年）</span>
     </div>
@@ -115,13 +130,13 @@
             container: 'map',
             // style: 'std.json',
             style: 'https://tile2.openstreetmap.jp/styles/osm-bright-ja/style.json',
-            zoom: 9.37,
+            zoom: 8.78,
             minZoom: 1,
             maxZoom: 23,
             pitch: 0,
             bearing: 0,
             maxPitch: 85,
-            center: [139.5708, 35.6288],
+            center: [140.8682, 38.3805],
             hash: true,
             attributionControl: false
         });
@@ -244,7 +259,7 @@
                 "paint": {
                     'fill-color': 'rgb(255, 127, 0)',
                     "fill-outline-color": "rgb(255, 127, 0)",
-                    'fill-opacity': 0.5
+                    'fill-opacity': 0.4
                 }
             });
 
@@ -258,7 +273,7 @@
                 "paint": {
                     'fill-color': 'rgb(255, 0, 0)',
                     "fill-outline-color": "rgb(255, 0, 0)",
-                    'fill-opacity': 0.5
+                    'fill-opacity': 0.4
                 }
             });
 
@@ -417,9 +432,153 @@
                 }
             });
 
+            // imageソース追加
+            map.loadImage('./img/bear-icon.png',
+                function (error, image) {
+                    if (error) throw error;
+                    map.addImage('bear-icon', image);
+                }
+            );
+
+            // 宮城県クマ目撃等情報ソース
+            map.addSource('miyagi-bear-sighting', {
+                'type': 'geojson',
+                'data': './令和５年度クマ目撃等情報マップ.geojson',
+                attribution: '<a href="https://www.pref.miyagi.jp/soshiki/sizenhogo/r5kuma.html">宮城県 令和5年度クマ目撃等情報</a>'
+            });
+
+            // 宮城県クマ目撃等情報シンボルレイヤ
+            map.addLayer({
+                'id': 'miyagi-bear-sighting-symbol',
+                "type": "symbol",
+                'source': 'miyagi-bear-sighting',
+                minzoom: 8,
+                maxzoom: 23,
+                "layout": {
+                    "icon-image": 'bear-icon',
+                    "icon-size": [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        1, 0.2,  // ズームレベル1でサイズは0.2
+                        12, 0.7  // ズームレベル12でサイズは0.7
+                    ],
+                    "icon-allow-overlap": true // シンボルの重なりを許可
+                }
+            });
+
+            // 宮城県クマ目撃等情報ラベルレイヤ
+            map.addLayer({
+                id: 'miyagi-bear-sighting-label',
+                type: 'symbol',
+                'source': 'miyagi-bear-sighting',
+                minzoom: 13,
+                maxzoom: 23,
+                layout: {
+                    'text-field': ['concat', ['get', 'Name'], ' ', ['get', 'description']],
+                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                    'text-size': 12,
+                    'text-offset': [0, 1],
+                    'text-allow-overlap': false,
+                    'text-ignore-placement': false,
+                    'text-max-width': 20  // テキストが折り返される前の最大幅を設定
+                },
+                paint: {
+                    'text-color': 'rgba(0, 0, 0, 1)',
+                    'text-halo-blur': 1,
+                    'text-halo-color': 'rgba(255, 255, 255, 1)',
+                    'text-halo-width': 2
+                }
+            });
+
+            // 札幌市クマ目撃等情報ソース
+            map.addSource('sapporo-bear-sighting', {
+                'type': 'geojson',
+                'data': './札幌市ヒグマ出没情報.geojson',
+                attribution: '<a href="https://www.city.sapporo.jp/kurashi/animal/choju/kuma/syutsubotsu/">札幌市 令和5年度ヒグマ出没情報</a>'
+            });
+
+            // 札幌市クマ目撃等情報シンボルレイヤ
+            map.addLayer({
+                'id': 'sapporo-bear-sighting-symbol',
+                "type": "symbol",
+                'source': 'sapporo-bear-sighting',
+                minzoom: 8,
+                maxzoom: 23,
+                "layout": {
+                    "icon-image": 'bear-icon',
+                    "icon-size": [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        1, 0.2,  // ズームレベル1でサイズは0.2
+                        12, 0.7  // ズームレベル12でサイズは0.7
+                    ],
+                    "icon-allow-overlap": true // シンボルの重なりを許可
+                }
+            });
+
+            // 札幌市クマ目撃等情報ラベルレイヤ
+            map.addLayer({
+                id: 'sapporo-bear-sighting-label',
+                type: 'symbol',
+                'source': 'sapporo-bear-sighting',
+                minzoom: 13,
+                maxzoom: 23,
+                layout: {
+                    'text-field': ['get', 'Name'],
+                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                    'text-size': 12,
+                    'text-offset': [0, 1],
+                    'text-allow-overlap': false,
+                    'text-ignore-placement': false,
+                    'text-max-width': 20  // テキストが折り返される前の最大幅を設定
+                },
+                paint: {
+                    'text-color': 'rgba(0, 0, 0, 1)',
+                    'text-halo-blur': 1,
+                    'text-halo-color': 'rgba(255, 255, 255, 1)',
+                    'text-halo-width': 2
+                }
+            });
+
             map.showTileBoundaries = false;
 
-        })
+        });
+
+        // 札幌市クマ目撃等情報ポップアップ表示
+        map.on('click', 'sapporo-bear-sighting-symbol', (e) => {
+            var lng = e.features[0].geometry.coordinates[0];
+            var lat = e.features[0].geometry.coordinates[1];
+            var description = e.features[0].properties['description'];
+            new maplibregl.Popup()
+                .setLngLat(e.lngLat)
+                .setHTML(
+                    '<div>' + description + '</div>' +
+                    '<div>緯度経度: ' + lat + ',' + lng + '</div>' +
+                    '<div><a href="https://www.google.com/maps?q=' + lat + ',' + lng + '&hl=ja" target="_blank">🌎Google Maps</a></div>' +
+                    '<div><a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=' + lat + ',' + lng + '&hl=ja" target="_blank">📷Street View</a></div>'
+                )
+                .addTo(map);
+        });
+
+        // 宮城県クマ目撃等情報ポップアップ表示
+        map.on('click', 'miyagi-bear-sighting-symbol', (e) => {
+            var lng = e.features[0].geometry.coordinates[0];
+            var lat = e.features[0].geometry.coordinates[1];
+            var Name = e.features[0].properties['Name'];
+            var description = e.features[0].properties['description'];
+            new maplibregl.Popup()
+                .setLngLat(e.lngLat)
+                .setHTML(
+                    '<div>' + Name + description + '</div>' +
+                    '<div>緯度経度: ' + lat + ',' + lng + '</div>' +
+                    '<div><a href="https://www.google.com/maps?q=' + lat + ',' + lng + '&hl=ja" target="_blank">🌎Google Maps</a></div>' +
+                    '<div><a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=' + lat + ',' + lng + '&hl=ja" target="_blank">📷Street View</a></div>'
+                )
+                .addTo(map);
+        });
+
     </script>
 </body>
 
