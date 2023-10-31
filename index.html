@@ -542,10 +542,113 @@
                 }
             });
 
+            // 青森県クマ目撃等情報ソース
+            map.addSource('aomori-bear-sighting', {
+                'type': 'geojson',
+                'data': './青森県ツキノワグマ出没状況2023.geojson',
+                attribution: '<a href="https://www.pref.aomori.lg.jp/soshiki/kankyo/shizen/kuma_cyuui.html">青森県 ツキノワグマ出没状況</a>'
+            });
+
+            // 青森県クマ目撃等情報シンボルレイヤ
+            map.addLayer({
+                'id': 'aomori-bear-sighting-symbol',
+                "type": "symbol",
+                'source': 'aomori-bear-sighting',
+                minzoom: 8,
+                maxzoom: 23,
+                "layout": {
+                    "icon-image": 'bear-icon',
+                    "icon-size": [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        1, 0.2,  // ズームレベル1でサイズは0.2
+                        12, 0.7  // ズームレベル12でサイズは0.7
+                    ],
+                    "icon-allow-overlap": true // シンボルの重なりを許可
+                }
+            });
+
+            // 青森県クマ目撃等情報ラベルレイヤ
+            map.addLayer({
+                id: 'aomori-bear-sighting-label',
+                type: 'symbol',
+                'source': 'aomori-bear-sighting',
+                minzoom: 13,
+                maxzoom: 23,
+                layout: {
+                    'text-field': ['get', 'Name'],
+                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                    'text-size': 12,
+                    'text-offset': [0, 1],
+                    'text-allow-overlap': false,
+                    'text-ignore-placement': false,
+                    'text-max-width': 20  // テキストが折り返される前の最大幅を設定
+                },
+                paint: {
+                    'text-color': 'rgba(0, 0, 0, 1)',
+                    'text-halo-blur': 1,
+                    'text-halo-color': 'rgba(255, 255, 255, 1)',
+                    'text-halo-width': 2
+                }
+            });
+
+            // 富山県クマ目撃等情報ソース
+            map.addSource('toyama-bear-sighting', {
+                'type': 'geojson',
+                'data': './富山県ツキノワグマ出没情報地図【クマっぷ】2023.geojson',
+                attribution: '<a href="https://www.pref.toyama.jp/1709/kurashi/kankyoushizen/shizen/yaseiseibutsu/kumap.html">富山県ツキノワグマ出没情報地図【クマっぷ】</a>'
+            });
+
+            // 富山県クマ目撃等情報シンボルレイヤ
+            map.addLayer({
+                'id': 'toyama-bear-sighting-symbol',
+                "type": "symbol",
+                'source': 'toyama-bear-sighting',
+                minzoom: 8,
+                maxzoom: 23,
+                "layout": {
+                    "icon-image": 'bear-icon',
+                    "icon-size": [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        1, 0.2,  // ズームレベル1でサイズは0.2
+                        12, 0.7  // ズームレベル12でサイズは0.7
+                    ],
+                    "icon-allow-overlap": true // シンボルの重なりを許可
+                }
+            });
+
+            // 青森県クマ目撃等情報ラベルレイヤ
+            map.addLayer({
+                id: 'toyama-bear-sighting-label',
+                type: 'symbol',
+                'source': 'toyama-bear-sighting',
+                minzoom: 13,
+                maxzoom: 23,
+                layout: {
+                    'text-field': ['get', 'Name'],
+                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                    'text-size': 12,
+                    'text-offset': [0, 1],
+                    'text-allow-overlap': false,
+                    'text-ignore-placement': false,
+                    'text-max-width': 20  // テキストが折り返される前の最大幅を設定
+                },
+                paint: {
+                    'text-color': 'rgba(0, 0, 0, 1)',
+                    'text-halo-blur': 1,
+                    'text-halo-color': 'rgba(255, 255, 255, 1)',
+                    'text-halo-width': 2
+                }
+            });
+
             map.showTileBoundaries = false;
 
         });
 
+        /*
         // 札幌市クマ目撃等情報ポップアップ表示
         map.on('click', 'sapporo-bear-sighting-symbol', (e) => {
             var lng = e.features[0].geometry.coordinates[0];
@@ -578,6 +681,7 @@
                 )
                 .addTo(map);
         });
+        */
 
     </script>
 </body>
