@@ -121,7 +121,7 @@
         <div class="square" style='background-color: rgb(255, 127, 0, 0.4); display: inline-block;'>
         </div><span style="display: inline-block; margin-left: 5px;">2010-2017年</span><br>
         <div><img src="./img/bear-icon.png" alt="熊アイコン" style="width:20px; height:20px;" />2023年度
-            クマ目撃等情報(2023-10-30時点)<br>(札幌市,青森県,山形県,宮城県,福島県,富山県)<br>※最新かつ詳細の状況などは必ず自治体にご確認ください。</div>
+            クマ目撃等情報(2023-10-30時点)<br>(札幌市,青森県,山形県,宮城県,福島県,富山県,石川県)<br>※最新かつ詳細の状況などは必ず自治体にご確認ください。</div>
         <div class="square" style='background-color: rgba(0, 203, 0, 0.5);display: inline-block;'></div>
         <span style="display: inline-block; margin-left: 5px;">人口集中地区（2020年）</span>
     </div>
@@ -639,6 +639,33 @@
                 }
             });
             */
+
+            // 石川県クマ目撃等情報ソース
+            map.addSource('ishikawa-bear-sighting', {
+                'type': 'geojson',
+                'data': './data/石川県R5ツキノワグマ目撃・痕跡情報.geojson',
+                attribution: '<a href="https://www.pref.ishikawa.lg.jp/sizen/kuma/r5map.html">石川県 令和5年ツキノワグマ出没マップ</a>'
+            });
+
+            // 福島県クマ目撃等情報シンボルレイヤ
+            map.addLayer({
+                'id': 'ishikawa-bear-sighting-symbol',
+                "type": "symbol",
+                'source': 'ishikawa-bear-sighting',
+                minzoom: 8,
+                maxzoom: 23,
+                "layout": {
+                    "icon-image": 'bear-icon',
+                    "icon-size": [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        1, 0.2,  // ズームレベル1でサイズは0.2
+                        12, 0.7  // ズームレベル12でサイズは0.7
+                    ],
+                    "icon-allow-overlap": true // シンボルの重なりを許可
+                }
+            });
 
             // 役場ソース
             map.addSource('town-hall', {
